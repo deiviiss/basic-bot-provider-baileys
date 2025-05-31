@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { createBot, createProvider, createFlow, addKeyword, utils } from '@builderbot/bot'
 import { MemoryDB as Database } from '@builderbot/bot'
 import { BaileysProvider as Provider } from '@builderbot/provider-baileys'
@@ -7,6 +6,21 @@ const PORT = process.env.PORT ?? 3008
 
 const welcomeFlow = addKeyword<Provider, Database>(['hi', 'hello', 'hola'])
   .addAnswer(`🙌 Hello welcome to this *Chatbot*`)
+  .addAction(async (_, { flowDynamic }) => {
+
+    await fetch(`http://localhost:3008/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        number: '+5219811250049',
+        message: `📦 Nuevo pedido confirmado`
+      })
+    })
+
+    await flowDynamic('Cada que escribas algo, le enviaremos un mensaje de confirmación al dueño del número. 😊')
+  })
 
 const main = async () => {
   const adapterFlow = createFlow([welcomeFlow])
